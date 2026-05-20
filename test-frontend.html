@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SGAOA - Frontend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .info { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover { background: #4338ca; }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+            width: 200px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SGAOA - Test de Connexion Frontend/Backend</h1>
+        
+        <div id="connectionStatus" class="status info">
+            <strong>🔍 Test de connexion en cours...</strong>
+        </div>
+
+        <h2>📊 État du Backend</h2>
+        <button onclick="testBackendConnection()">Tester connexion Backend</button>
+        <button onclick="testHealthCheck()">Health Check</button>
+        <button onclick="testDatabaseConnection()">Tester Base de Données</button>
+
+        <h2>🔐 Test d'Authentification</h2>
+        <div class="form-group">
+            <input type="email" id="testEmail" placeholder="Email de test" value="test@example.com">
+            <input type="password" id="testPassword" placeholder="Mot de passe" value="password123">
+        </div>
+        <button onclick="testLogin()">Tester Connexion</button>
+        <button onclick="testRegister()">Tester Inscription</button>
+
+        <h2>📡 Tests API</h2>
+        <button onclick="testGetUsers()">GET /api/comptes</button>
+        <button onclick="testCreateUser()">POST /api/comptes</button>
+        <button onclick="testProtectedEndpoint()">Endpoint Protégé</button>
+
+        <div id="results" class="result" style="display: none;">
+            <!-- Résultats des tests -->
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081/api';
+        
+        // Afficher les résultats
+        function showResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.style.display = 'block';
+            results.innerHTML += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        // Mettre à jour le statut de connexion
+        function updateConnectionStatus(connected, message) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'status success';
+                status.innerHTML = `<strong>✅ Backend Connecté</strong><br>${message}`;
+            } else {
+                status.className = 'status error';
+                status.innerHTML = `<strong>❌ Backend Non Connecté</strong><br>${message}`;
+            }
+        }
+
+        // Test de connexion backend
+        async function testBackendConnection() {
+            showResult('Test de connexion au backend...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/auth/test`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    showResult(`✅ Backend répond: ${data}`, 'success');
+                    updateConnectionStatus(true, `Backend accessible sur ${API_BASE}`);
+                } else {
+                    showResult(`❌ Erreur HTTP: ${response.status} ${response.statusText}`, 'error');
+                    updateConnectionStatus(false, `Erreur ${response.status}`);
+                }
+            } catch (error) {
+                showResult(`❌ Erreur de connexion: ${error.message}`, 'error');
+                updateConnectionStatus(false, 'Impossible de se connecter au backend');
+            }
+        }
+
+        // Health check
+        async function testHealthCheck() {
+            showResult('Health check...', 'info');
+            try {
+                const response = await fetch('http://localhost:8081/actuator/health');
+                const data = await response.json();
+                showResult(`✅ Health: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ Health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test base de données
+        async function testDatabaseConnection() {
+            showResult('Test de connexion base de données...', 'info');
+            try {
+                // Tenter de créer un utilisateur pour tester la BDD
+                const testUser = {
+                    nom: "Test",
+                    prenom: "User",
+                    email: `test${Date.now()}@example.com`,
+                    motDePasse: "password123",
+                    telephone: "0123456789"
+                };
+
+                const response = await fetch(`${API_BASE}/auth/inscription`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testUser)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Base de données connectée: Utilisateur créé`, 'success');
+                    showResult(`Réponse: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    const error = await response.text();
+                    showResult(`⚠️ Test BDD: ${response.status} - ${error}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur base de données: ${error.message}`, 'error');
+            }
+        }
+
+        // Test de connexion
+        async function testLogin() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            showResult(`Test de connexion avec ${email}...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/connexion`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        motDePasse: password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Connexion réussie!`, 'success');
+                    showResult(`Token: ${data.accessToken?.substring(0, 50)}...`, 'info');
+                    showResult(`Utilisateur: ${data.utilisateur?.prenom} ${data.utilisateur?.nom}`, 'info');
+                    
+                    // Stocker le token pour les tests suivants
+                    localStorage.setItem('sgaoa_token', data.accessToken);
+                } else {
+                    showResult(`❌ Échec connexion: ${data.message || 'Erreur inconnue'}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur connexion: ${error.message}`, 'error');
+            }
+        }
+
+        // Test d'inscription
+        async function testRegister() {
+            showResult('Test d\'inscription...', 'info');
+            
+            const newUser = {
+                nom: "Nouveau",
+                prenom: "Utilisateur",
+                email: `user${Date.now()}@example.com`,
+                motDePasse: "password123",
+                telephone: "0123456789"
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/inscription`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newUser)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Inscription réussie!`, 'success');
+                    showResult(`Utilisateur: ${data.prenom} ${data.nom}`, 'info');
+                } else {
+                    showResult(`❌ Échec inscription: ${data.message || 'Erreur inconnue'}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur inscription: ${error.message}`, 'error');
+            }
+        }
+
+        // Test GET users
+        async function testGetUsers() {
+            const token = localStorage.getItem('sgaoa_token');
+            
+            if (!token) {
+                showResult('❌ Veuillez vous connecter d\'abord', 'error');
+                return;
+            }
+
+            showResult('Test GET /api/comptes...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/comptes`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ ${data.length} utilisateurs trouvés`, 'success');
+                    showResult(`Liste: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    showResult(`❌ Erreur: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test création utilisateur
+        async function testCreateUser() {
+            const token = localStorage.getItem('sgaoa_token');
+            
+            if (!token) {
+                showResult('❌ Veuillez vous connecter d\'abord', 'error');
+                return;
+            }
+
+            showResult('Test POST /api/comptes...', 'info');
+            
+            const newUser = {
+                nom: "Admin",
+                prenom: "Test",
+                email: `admin${Date.now()}@example.com`,
+                motDePasse: "admin123",
+                telephone: "0987654321",
+                role: "ADMINISTRATEUR"
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/comptes`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newUser)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Utilisateur créé avec succès!`, 'success');
+                    showResult(`ID: ${data.id}`, 'info');
+                } else {
+                    const error = await response.text();
+                    showResult(`❌ Erreur création: ${error}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test endpoint protégé
+        async function testProtectedEndpoint() {
+            const token = localStorage.getItem('sgaoa_token');
+            
+            if (!token) {
+                showResult('❌ Veuillez vous connecter d\'abord', 'error');
+                return;
+            }
+
+            showResult('Test endpoint protégé...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/test`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.text();
+                    showResult(`✅ Endpoint protégé accessible: ${data}`, 'success');
+                } else {
+                    showResult(`❌ Accès refusé: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            showResult('🚀 Démarrage des tests de connexion...', 'info');
+            setTimeout(testBackendConnection, 1000);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Dossier de compilation Java
+target/
+
+# Fichiers IntelliJ IDEA
+.idea/
+*.iml
+
+# Fichiers de configuration sensibles
+application-prod.properties
+
+# Logs
+*.log

@@ -1,0 +1,67 @@
+========================================
+CONFIGURATIONS MYSQL À TESTER POUR SGAOA
+========================================
+
+TEST 1: XAMPP (le plus courant)
+---------------------------------
+spring.datasource.username=root
+spring.datasource.password=
+
+TEST 2: XAMPP avec mot de passe
+---------------------------------
+spring.datasource.username=root
+spring.datasource.password=root
+
+TEST 3: MySQL avec mot de passe personnalisé
+---------------------------------
+spring.datasource.username=root
+spring.datasource.password=admin1234
+
+TEST 4: MySQL avec utilisateur différent
+---------------------------------
+spring.datasource.username=sgaoa_user
+spring.datasource.password=sgaoa_pass
+
+========================================
+COMMENT TESTER CHAQUE CONFIGURATION
+========================================
+
+1. Arrêtez le serveur Spring Boot (Ctrl+C)
+2. Modifiez application.properties avec une des configs ci-dessus
+3. Relancez: ./mvnw.cmd spring-boot:run
+4. Regardez les logs pour voir si la connexion réussit
+
+========================================
+CRÉER LA BASE DE DONNÉES MANUELLEMENT
+========================================
+
+Si vous avez accès à MySQL:
+
+mysql -u root -p
+CREATE DATABASE sgaoa_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+SHOW DATABASES;
+EXIT;
+
+========================================
+VÉRIFIER L'INSTALLATION MYSQL
+========================================
+
+1. Ouvrez XAMPP Control Panel si vous l'avez
+2. Vérifiez que MySQL est démarré (vert)
+3. Cliquez sur "Admin" pour accéder à phpMyAdmin
+4. Créez la base "sgaoa_db"
+
+Ou vérifiez les services Windows:
+- Services.msc
+- Cherchez "MySQL" ou "MariaDB"
+- Vérifiez qu'il est "En cours d'exécution"
+
+========================================
+SI AUCUNE CONFIGURATION NE FONCTIONNE
+========================================
+
+1. Réinstallez MySQL/XAMPP
+2. Notez bien le mot de passe lors de l'installation
+3. Utilisez ce mot de passe dans la configuration
+
+OU restez avec H2 (plus simple pour le développement)

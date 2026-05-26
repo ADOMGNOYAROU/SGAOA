@@ -1,0 +1,495 @@
+<!-- Header Section -->
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-serif font-bold text-[#1C1C1E] mb-2">Gestion des Adoptants</h1>
+      <p class="text-gray-600 font-sans">Suivi et gestion des candidats à l'adoption</p>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="exportAdoptants()"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+          </path>
+        </svg>
+        <span class="font-medium">Exporter</span>
+      </button>
+      <button (click)="openAddModal()"
+        class="flex items-center gap-2 px-4 py-2 bg-[#4A7C59] text-white rounded-xl hover:bg-opacity-90 transition-all duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span class="font-medium">Ajouter un adoptant</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-4 border-l-4 border-green-500">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500 font-medium">Actifs</p>
+        <p class="text-2xl font-bold text-gray-900">{{ adoptants.filter(a => a.statut === 'ACTIF').length }}</p>
+      </div>
+      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-4 border-l-4 border-gray-500">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500 font-medium">Inactifs</p>
+        <p class="text-2xl font-bold text-gray-900">{{ adoptants.filter(a => a.statut === 'INACTIF').length }}</p>
+      </div>
+      <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-4 border-l-4 border-blue-500">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500 font-medium">Vérifiés</p>
+        <p class="text-2xl font-bold text-gray-900">{{ adoptants.filter(a => a.verified).length }}</p>
+      </div>
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-4 border-l-4 border-yellow-500">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500 font-medium">Total</p>
+        <p class="text-2xl font-bold text-gray-900">{{ adoptants.length }}</p>
+      </div>
+      <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+          </path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Section -->
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+      <div class="relative">
+        <input type="text" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+          placeholder="Référence, nom, email, ville..."
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+      <select [(ngModel)]="statutFilter" (change)="onStatutFilterChange()"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        <option value="TOUS">Tous les statuts</option>
+        <option value="ACTIF">Actif</option>
+        <option value="INACTIF">Inactif</option>
+        <option value="SUSPENDU">Suspendu</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Vérification</label>
+      <select [(ngModel)]="verificationFilter" (change)="onVerificationFilterChange()"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        <option value="TOUS">Tous</option>
+        <option value="VERIFIED">Vérifiés</option>
+        <option value="UNVERIFIED">Non vérifiés</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (isLoading) {
+<div class="flex items-center justify-center py-12">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A7C59]"></div>
+</div>
+}
+
+<!-- Adoptants Table -->
+@if (!isLoading && filteredAdoptants.length > 0) {
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adoptant</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localisation</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profession</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vérification</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date inscription
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        @for (adoptant of filteredAdoptants; track adoptant.id) {
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-[#4A7C59]/20 rounded-full flex items-center justify-center mr-3">
+                <span class="text-[#4A7C59] font-semibold text-sm">{{ adoptant.prenom.charAt(0) }}{{
+                  adoptant.nom.charAt(0) }}</span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-900">{{ adoptant.prenom }} {{ adoptant.nom }}</div>
+                <div class="text-sm text-gray-500">{{ adoptant.reference }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm">
+              <div class="text-gray-900">{{ adoptant.email }}</div>
+              <div class="text-gray-500">{{ adoptant.telephone }}</div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">{{ adoptant.ville }}</div>
+            <div class="text-sm text-gray-500">{{ adoptant.pays }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">{{ adoptant.profession }}</div>
+            <div class="text-sm text-gray-500">{{ adoptant.revenuMensuel | number:'fr-FR' }} FCFA/mois</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ getStatutColor(adoptant.statut) }}">
+              {{ getStatutLabel(adoptant.statut) }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            @if (adoptant.verified) {
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd"></path>
+              </svg>
+              Vérifié
+            </span>
+            } @else {
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"></path>
+              </svg>
+              En attente
+            </span>
+            }
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ adoptant.dateInscription | date:'dd/MM/yyyy' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <button (click)="viewAdoptantDetails(adoptant)"
+              class="text-[#4A7C59] hover:text-[#4A7C59]/80 transition-colors">
+              Voir détails
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+}
+
+<!-- Empty State -->
+@if (!isLoading && filteredAdoptants.length === 0) {
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-12">
+  <div class="text-center">
+    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+      </path>
+    </svg>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun adoptant trouvé</h3>
+    <p class="text-gray-500">Aucun adoptant ne correspond à vos critères de recherche.</p>
+  </div>
+</div>
+}
+
+<!-- Details Modal -->
+@if (showDetailsModal && selectedAdoptant) {
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeModal()">
+  <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-xl bg-white"
+    (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-gray-900">Détails de {{ selectedAdoptant.prenom }} {{ selectedAdoptant.nom
+        }}</h3>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Profile Section -->
+      <div class="lg:col-span-1">
+        <div class="text-center">
+          <div class="w-24 h-24 bg-[#4A7C59]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-[#4A7C59] font-bold text-2xl">{{ selectedAdoptant.prenom.charAt(0) }}{{
+              selectedAdoptant.nom.charAt(0) }}</span>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900">{{ selectedAdoptant.prenom }} {{ selectedAdoptant.nom }}</h4>
+          <p class="text-gray-500">{{ selectedAdoptant.reference }}</p>
+
+          <div class="mt-4 space-y-2">
+            <div class="flex justify-center">
+              <span
+                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ getStatutColor(selectedAdoptant.statut) }}">
+                {{ getStatutLabel(selectedAdoptant.statut) }}
+              </span>
+            </div>
+            @if (selectedAdoptant.verified) {
+            <div class="flex justify-center">
+              <span
+                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                ✓ Vérifié
+              </span>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Informations Personnelles -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="font-semibold text-gray-900 mb-3">Informations Personnelles</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-600">Date de naissance:</p>
+              <p class="font-medium">{{ selectedAdoptant.dateNaissance | date:'dd/MM/yyyy' }} ({{ selectedAdoptant.age
+                }} ans)</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Email:</p>
+              <p class="font-medium">{{ selectedAdoptant.email }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Téléphone:</p>
+              <p class="font-medium">{{ selectedAdoptant.telephone }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Date d'inscription:</p>
+              <p class="font-medium">{{ selectedAdoptant.dateInscription | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="font-semibold text-gray-900 mb-3">Adresse</h4>
+          <div class="space-y-2">
+            <div>
+              <p class="text-sm text-gray-600">Adresse:</p>
+              <p class="font-medium">{{ selectedAdoptant.adresse }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Ville:</p>
+                <p class="font-medium">{{ selectedAdoptant.ville }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Pays:</p>
+                <p class="font-medium">{{ selectedAdoptant.pays }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professionnel -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="font-semibold text-gray-900 mb-3">Informations Professionnelles</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-600">Profession:</p>
+              <p class="font-medium">{{ selectedAdoptant.profession }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Revenu mensuel:</p>
+              <p class="font-medium">{{ selectedAdoptant.revenuMensuel | number:'fr-FR' }} FCFA</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dossiers -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h4 class="font-semibold text-gray-900 mb-3">Dossiers d'Adoption</h4>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p class="text-2xl font-bold text-[#4A7C59]">{{ selectedAdoptant.dossierCount }}</p>
+              <p class="text-sm text-gray-600">Dossiers</p>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-[#D4862A]">{{ selectedAdoptant.documents }}</p>
+              <p class="text-sm text-gray-600">Documents</p>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-gray-900">{{ selectedAdoptant.dernierDossier }}</p>
+              <p class="text-sm text-gray-600">Dernier dossier</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="closeModal()"
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+        Fermer
+      </button>
+      <button class="px-4 py-2 bg-[#4A7C59] text-white rounded-lg hover:bg-opacity-90 transition-colors mr-2">
+        Modifier le profil
+      </button>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        Voir les dossiers
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Add Modal -->
+@if (showAddModal) {
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeAddModal()">
+  <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-xl bg-white"
+    (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-gray-900">Ajouter un nouvel adoptant</h3>
+      <button (click)="closeAddModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveNewAdoptant()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+          <input type="text" [(ngModel)]="nouvelAdoptant.prenom" name="prenom" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+          <input type="text" [(ngModel)]="nouvelAdoptant.nom" name="nom" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" [(ngModel)]="nouvelAdoptant.email" name="email" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+          <input type="tel" [(ngModel)]="nouvelAdoptant.telephone" name="telephone" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
+        <input type="text" [(ngModel)]="nouvelAdoptant.adresse" name="adresse" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+          <input type="text" [(ngModel)]="nouvelAdoptant.ville" name="ville" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pays</label>
+          <input type="text" [(ngModel)]="nouvelAdoptant.pays" name="pays" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Profession</label>
+          <input type="text" [(ngModel)]="nouvelAdoptant.profession" name="profession" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Revenu mensuel</label>
+          <input type="number" [(ngModel)]="nouvelAdoptant.revenuMensuel" name="revenuMensuel" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
+          <input type="date" [(ngModel)]="nouvelAdoptant.dateNaissance" name="dateNaissance" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+          <select [(ngModel)]="nouvelAdoptant.statut" name="statut" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+            <option value="ACTIF">Actif</option>
+            <option value="INACTIF">Inactif</option>
+            <option value="SUSPENDU">Suspendu</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button" (click)="closeAddModal()"
+          class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+          Annuler
+        </button>
+        <button type="submit"
+          class="px-4 py-2 bg-[#4A7C59] text-white rounded-lg hover:bg-opacity-90 transition-colors">
+          Ajouter l'adoptant
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}

@@ -1,0 +1,299 @@
+<!-- Header Section -->
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-serif font-bold text-[#1C1C1E] mb-2">Paramètres du Système</h1>
+      <p class="text-gray-600 font-sans">Configuration et gestion des paramètres de l'application</p>
+    </div>
+    <div class="flex gap-3">
+      <button (click)="saveAllParametres()"
+        class="flex items-center gap-2 px-4 py-2 bg-[#4A7C59] text-white rounded-xl hover:bg-opacity-90 transition-all duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"></path>
+        </svg>
+        <span class="font-medium">Sauvegarder tout</span>
+      </button>
+      <button (click)="resetParametres()"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+          </path>
+        </svg>
+        <span class="font-medium">Réinitialiser</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+@if (showNotificationFlag) {
+<div class="fixed top-4 right-4 z-50 animate-pulse">
+  <div class="bg-white rounded-lg shadow-lg ring-1 ring-gray-100 p-4 flex items-center gap-3 min-w-[300px]">
+    <div class="flex-shrink-0">
+      @if (notificationType === 'success') {
+      <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      } @else if (notificationType === 'error') {
+      <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      } @else {
+      <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+        </path>
+      </svg>
+      }
+    </div>
+    <p class="text-gray-800 font-medium">{{ notificationMessage }}</p>
+  </div>
+</div>
+}
+
+<!-- Loading State -->
+@if (isLoading) {
+<div class="flex items-center justify-center py-12">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A7C59]"></div>
+</div>
+}
+
+<!-- Main Content -->
+@if (!isLoading) {
+<div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 overflow-hidden">
+  <!-- Tabs Navigation -->
+  <div class="border-b border-gray-200">
+    <nav class="flex -mb-px">
+      <button (click)="setActiveTab('general')" class="py-4 px-6 text-sm font-medium border-b-2 transition-colors"
+        [class]="activeTab === 'general' ? 'border-[#4A7C59] text-[#4A7C59]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+            </path>
+          </svg>
+          Général
+        </div>
+      </button>
+      <button (click)="setActiveTab('system')" class="py-4 px-6 text-sm font-medium border-b-2 transition-colors"
+        [class]="activeTab === 'system' ? 'border-[#4A7C59] text-[#4A7C59]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+            </path>
+          </svg>
+          Système
+        </div>
+      </button>
+      <button (click)="setActiveTab('security')" class="py-4 px-6 text-sm font-medium border-b-2 transition-colors"
+        [class]="activeTab === 'security' ? 'border-[#4A7C59] text-[#4A7C59]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
+          </svg>
+          Sécurité
+        </div>
+      </button>
+      <button (click)="setActiveTab('backup')" class="py-4 px-6 text-sm font-medium border-b-2 transition-colors"
+        [class]="activeTab === 'backup' ? 'border-[#4A7C59] text-[#4A7C59]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          Sauvegardes
+        </div>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="p-6">
+    <!-- General Tab -->
+    @if (activeTab === 'general') {
+    <div class="space-y-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Paramètres Généraux</h2>
+      @for (parametre of parametresGeneraux; track parametre.id) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 bg-gray-50 rounded-lg">
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ parametre.description }}</label>
+          <p class="text-xs text-gray-500">{{ parametre.nom }}</p>
+        </div>
+        <div class="md:col-span-2">
+          @if (parametre.type === 'boolean') {
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+              class="sr-only peer">
+            <div
+              class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#4A7C59]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4A7C59]">
+            </div>
+          </label>
+          } @else if (parametre.type === 'select') {
+          <select [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+            @for (option of parametre.options; track option) {
+            <option [value]="option">{{ option }}</option>
+            }
+          </select>
+          } @else {
+          <input [type]="parametre.type" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- System Tab -->
+    @if (activeTab === 'system') {
+    <div class="space-y-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Paramètres Système</h2>
+      @for (parametre of parametresSysteme; track parametre.id) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 bg-gray-50 rounded-lg">
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ parametre.description }}</label>
+          <p class="text-xs text-gray-500">{{ parametre.nom }}</p>
+        </div>
+        <div class="md:col-span-2">
+          @if (parametre.type === 'boolean') {
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+              class="sr-only peer">
+            <div
+              class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#4A7C59]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4A7C59]">
+            </div>
+          </label>
+          } @else if (parametre.type === 'select') {
+          <select [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+            @for (option of parametre.options; track option) {
+            <option [value]="option">{{ option }}</option>
+            }
+          </select>
+          } @else {
+          <input [type]="parametre.type" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Security Tab -->
+    @if (activeTab === 'security') {
+    <div class="space-y-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Paramètres de Sécurité</h2>
+      @for (parametre of parametresSecurite; track parametre.id) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 bg-gray-50 rounded-lg">
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ parametre.description }}</label>
+          <p class="text-xs text-gray-500">{{ parametre.nom }}</p>
+        </div>
+        <div class="md:col-span-2">
+          @if (parametre.type === 'boolean') {
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+              class="sr-only peer">
+            <div
+              class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#4A7C59]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4A7C59]">
+            </div>
+          </label>
+          } @else if (parametre.type === 'select') {
+          <select [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+            @for (option of parametre.options; track option) {
+            <option [value]="option">{{ option }}</option>
+            }
+          </select>
+          } @else {
+          <input [type]="parametre.type" [(ngModel)]="parametre.valeur" (ngModelChange)="updateParametre(parametre)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Backup Tab -->
+    @if (activeTab === 'backup') {
+    <div class="space-y-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Gestion des Sauvegardes</h2>
+        <button (click)="createBackup()"
+          class="flex items-center gap-2 px-4 py-2 bg-[#4A7C59] text-white rounded-lg hover:bg-opacity-90 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          Créer une sauvegarde
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taille</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (backup of backups; track backup.id) {
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ backup.nom }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ backup.date | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatTaille(backup.taille) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ getTypeColor(backup.type) }}">
+                  {{ backup.type }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ getStatutColor(backup.statut) }}">
+                  {{ backup.statut }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex gap-2">
+                  <button (click)="restoreBackup(backup)" class="text-blue-600 hover:text-blue-800 transition-colors">
+                    Restaurer
+                  </button>
+                  <button (click)="deleteBackup(backup)" class="text-red-600 hover:text-red-800 transition-colors">
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}

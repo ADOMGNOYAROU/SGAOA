@@ -40,6 +40,8 @@ public class Utilisateur implements UserDetails {
     @Column(unique = true)
     private String telephone;
 
+    private String adresse;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -66,7 +68,8 @@ public class Utilisateur implements UserDetails {
     protected void onCreate() {
         dateCreation = LocalDateTime.now();
         dateModification = LocalDateTime.now();
-        if (emailVerifie == null) emailVerifie = false;
+        if (emailVerifie == null)
+            emailVerifie = false;
     }
 
     @PreUpdate
@@ -90,7 +93,9 @@ public class Utilisateur implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
     public boolean isAccountNonLocked() {
@@ -98,7 +103,9 @@ public class Utilisateur implements UserDetails {
     }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
     public boolean isEnabled() {

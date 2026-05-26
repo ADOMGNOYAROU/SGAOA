@@ -36,9 +36,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> utilisateurRepository.findByEmail(username)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("Utilisateur non trouvé : " + username)
-                );
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
     }
 
     @Bean
@@ -67,14 +65,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/utilisateurs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRATEUR")
                         .requestMatchers("/api/comptes/**")
-                        .hasAnyRole("ADMINISTRATEUR","PRESIDENT_COMITE","SECRETAIRE")
-                        .anyRequest().authenticated()
-                )
+                        .hasAnyRole("ADMINISTRATEUR", "PRESIDENT_COMITE", "SECRETAIRE")
+                        .anyRequest().authenticated())
                 .sessionManagement(sess -> sess
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -84,10 +81,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
         configuration.setAllowedMethods(
-                List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS")
-        );
+                List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

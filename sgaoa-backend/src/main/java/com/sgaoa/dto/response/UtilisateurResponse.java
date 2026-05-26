@@ -19,6 +19,7 @@ public class UtilisateurResponse {
     private String prenom;
     private String email;
     private String telephone;
+    private String adresse;
     private Role role;
     private StatutCompte statut;
     private Boolean emailVerifie;

@@ -7,9 +7,10 @@ import {
 import { Observable } from 'rxjs';
 
 export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
 
-  if (token) {
+  // Ne pas ajouter le token pour les requêtes d'authentification
+  if (token && !req.url.includes('/auth/')) {
     const authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

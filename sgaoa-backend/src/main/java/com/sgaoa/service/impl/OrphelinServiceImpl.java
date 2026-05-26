@@ -1,14 +1,11 @@
 package com.sgaoa.service.impl;
 
-import com.sgaoa.dto.request.CreateOrphelinRequest;
-import com.sgaoa.dto.request.UpdateOrphelinRequest;
 import com.sgaoa.dto.response.OrphelinResponse;
 import com.sgaoa.entity.Orphelin;
 import com.sgaoa.enums.StatutOrphelin;
 import com.sgaoa.repository.OrphelinRepository;
 import com.sgaoa.service.OrphelinService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +26,7 @@ public class OrphelinServiceImpl implements OrphelinService {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public OrphelinResponse creerOrphelin(CreateOrphelinRequest request) {
+    public OrphelinResponse creerOrphelin(OrphelinService.CreateOrphelinRequest request) {
         Orphelin orphelin = Orphelin.builder()
                 .nom(request.nom())
                 .prenom(request.prenom())
@@ -42,16 +39,20 @@ public class OrphelinServiceImpl implements OrphelinService {
                 .statut(request.statut() != null ? request.statut() : StatutOrphelin.DISPONIBLE)
                 .build();
 
-        Orphelin savedOrphelin = orphelinRepository.save(orphelin);
-        assert savedOrphelin != null;
-        return mapToResponse(savedOrphelin);
+        if (orphelin != null) {
+            Orphelin savedOrphelin = orphelinRepository.save(orphelin);
+            return mapToResponse(savedOrphelin);
+        }
+        throw new RuntimeException("Erreur lors de la création de l'orphelin.");
     }
 
     @Override
-    public OrphelinResponse modifierOrphelin(Long id, UpdateOrphelinRequest request) {
+    public OrphelinResponse modifierOrphelin(Long id, OrphelinService.UpdateOrphelinRequest request) {
+        if (id == null) {
+            throw new RuntimeException("L'ID ne peut pas être null.");
+        }
         Orphelin orphelin = orphelinRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orphelin non trouvé avec l'ID: " + id));
-        assert orphelin != null;
 
         if (request.nom() != null)
             orphelin.setNom(request.nom());
@@ -72,17 +73,21 @@ public class OrphelinServiceImpl implements OrphelinService {
         if (request.statut() != null)
             orphelin.setStatut(request.statut());
 
-        Orphelin savedOrphelin = orphelinRepository.save(orphelin);
-        assert savedOrphelin != null;
-        return mapToResponse(savedOrphelin);
+        if (orphelin != null) {
+            Orphelin savedOrphelin = orphelinRepository.save(orphelin);
+            return mapToResponse(savedOrphelin);
+        }
+        throw new RuntimeException("Erreur lors de la modification de l'orphelin.");
     }
 
     @Override
     @Transactional(readOnly = true)
     public OrphelinResponse obtenirOrphelinParId(Long id) {
+        if (id == null) {
+            throw new RuntimeException("L'ID ne peut pas être null.");
+        }
         Orphelin orphelin = orphelinRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orphelin non trouvé avec l'ID: " + id));
-        assert orphelin != null;
         return mapToResponse(orphelin);
     }
 
@@ -104,16 +109,20 @@ public class OrphelinServiceImpl implements OrphelinService {
 
     @Override
     public void changerStatutOrphelin(Long id, StatutOrphelin statut) {
+        if (id == null) {
+            throw new RuntimeException("L'ID ne peut pas être null.");
+        }
         Orphelin orphelin = orphelinRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orphelin non trouvé avec l'ID: " + id));
-        assert orphelin != null;
         orphelin.setStatut(statut);
         orphelinRepository.save(orphelin);
     }
 
     @Override
     public void supprimerOrphelin(Long id) {
-        assert id != null;
+        if (id == null) {
+            throw new RuntimeException("L'ID ne peut pas être null.");
+        }
         if (!orphelinRepository.existsById(id)) {
             throw new RuntimeException("Orphelin non trouvé avec l'ID: " + id);
         }

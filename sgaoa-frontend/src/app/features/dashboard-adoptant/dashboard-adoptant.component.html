@@ -1,0 +1,145 @@
+<!-- Contenu principal -->
+@if (isLoading()) {
+<div class="flex justify-center items-center h-64">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4A7C59]"></div>
+</div>
+} @else {
+<!-- Welcome Banner -->
+<div class="bg-gradient-to-r from-[#4A7C59]/10 to-white rounded-2xl p-6 mb-8 border border-[#4A7C59]/20">
+  <h2 class="text-3xl font-serif font-bold text-[#1C1C1E] mb-2">
+    Bonjour, {{ currentUser()?.prenom }}
+  </h2>
+  <p class="text-gray-600 font-sans">Voici l'état de votre dossier d'adoption</p>
+</div>
+
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Mon Profil Card (full width on mobile, spans 2 cols on desktop) -->
+  <div
+    class="lg:col-span-2 bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 hover:shadow-md transition-all duration-200 border-l-4 border-[#4A7C59]">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <svg class="w-6 h-6 text-[#4A7C59]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-[#1C1C1E]">Mon Profil</h3>
+      </div>
+      <!-- Avatar initials top-right -->
+      <div class="w-12 h-12 rounded-full bg-[#4A7C59] flex items-center justify-center text-white font-bold text-lg">
+        {{ getInitials() }}
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-sm text-gray-500 mb-1">Nom</p>
+        <p class="text-[#1C1C1E] font-semibold">{{ currentUser()?.nom }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500 mb-1">Prénom</p>
+        <p class="text-[#1C1C1E] font-semibold">{{ currentUser()?.prenom }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500 mb-1">Email</p>
+        <p class="text-[#1C1C1E] font-semibold">{{ currentUser()?.email }}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-500 mb-1">Téléphone</p>
+        <p class="text-[#1C1C1E] font-semibold">{{ currentUser()?.telephone || 'Non renseigné' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mes Demandes d'Adoption Card -->
+  <div
+    class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 hover:shadow-md transition-all duration-200 border-l-4 border-[#4A7C59]">
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-6 h-6 text-[#4A7C59]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+        </path>
+      </svg>
+      <h3 class="text-xl font-semibold text-[#1C1C1E]">Mes Demandes d'Adoption</h3>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8">
+      <!-- SVG House + Heart icon -->
+      <svg class="w-16 h-16 text-[#4A7C59] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+        </path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+        </path>
+      </svg>
+      <p class="text-gray-500 text-center mb-4">Aucune demande en cours</p>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Sélectionner un orphelin</label>
+        <select [(ngModel)]="orphelinSelectionne"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent">
+          <option value="">-- Choisir un orphelin --</option>
+          @for (orphelin of orphelinsDisponibles(); track orphelin.id) {
+          <option [value]="orphelin.id">{{ orphelin.prenom }} {{ orphelin.nom }} ({{ orphelin.age }} ans)</option>
+          }
+        </select>
+      </div>
+      <button (click)="creerDemande()"
+        class="bg-[#4A7C59] text-white rounded-full px-6 py-2.5 hover:bg-opacity-90 transition-all duration-200 flex items-center gap-2 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Créer une demande
+      </button>
+    </div>
+  </div>
+
+  <!-- Mes Documents Card -->
+  <div
+    class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 hover:shadow-md transition-all duration-200 border-l-4 border-[#D4862A]">
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-6 h-6 text-[#D4862A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+      </svg>
+      <h3 class="text-xl font-semibold text-[#1C1C1E]">Mes Documents</h3>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8">
+      <!-- SVG Document with upload arrow -->
+      <svg class="w-16 h-16 text-[#D4862A] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+      </svg>
+      <p class="text-[#D4862A] text-center mb-4 font-medium">Aucun document déposé</p>
+      <button
+        class="bg-[#D4862A] text-white rounded-full px-6 py-2.5 hover:bg-opacity-90 transition-all duration-200 flex items-center gap-2 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+        </svg>
+        Déposer un document
+      </button>
+    </div>
+  </div>
+
+  <!-- Notifications Card -->
+  <div
+    class="lg:col-span-2 bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 hover:shadow-md transition-all duration-200 border-l-4 border-gray-300">
+    <div class="flex items-center gap-3 mb-6">
+      <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+        </path>
+      </svg>
+      <h3 class="text-xl font-semibold text-[#1C1C1E]">Notifications</h3>
+    </div>
+    <div class="flex flex-col items-center justify-center py-8">
+      <!-- Bell icon -->
+      <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+        </path>
+      </svg>
+      <p class="text-gray-400 italic text-center">Vous n'avez aucune notification pour le moment</p>
+    </div>
+  </div>
+</div>
+}

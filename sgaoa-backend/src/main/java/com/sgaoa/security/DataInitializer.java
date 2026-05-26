@@ -43,6 +43,8 @@ public class DataInitializer implements CommandLineRunner {
                 .emailVerifie(true)
                 .build();
 
-        utilisateurRepository.save(admin);
+        if (admin != null) {
+            utilisateurRepository.save(admin);
+        }
     }
 }

@@ -25,4 +25,6 @@ public class InscriptionRequest {
 
     @Pattern(regexp = "^[+]?[0-9]{8,15}$", message = "Format téléphone invalide")
     private String telephone;
+
+    private String adresse;
 }

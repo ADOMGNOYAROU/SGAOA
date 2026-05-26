@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject, tap, throwError } from 'rxjs';
 import { LoginRequest, InscriptionRequest, AuthResponse } from '../models/auth.model';
 import { Utilisateur, Role } from '../models/utilisateur.model';
 
@@ -17,9 +17,13 @@ export class AuthService {
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/connexion`, request).pipe(
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<AuthResponse>(`${this.apiUrl}/connexion`, request, { headers }).pipe(
       tap(response => {
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.utilisateur));
         this.currentUserSubject.next(response.utilisateur as Utilisateur);
       })
@@ -31,13 +35,31 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  getAccessToken(): string | null {
+    return localStorage.getItem('accessToken');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
+  refreshToken(): Observable<AuthResponse> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
+      tap(response => {
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+      })
+    );
   }
 
   getCurrentUser(): Utilisateur | null {
@@ -45,7 +67,7 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.getAccessToken();
   }
 
   hasRole(role: Role): boolean {

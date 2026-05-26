@@ -54,13 +54,17 @@ public class CompteServiceImpl implements CompteService {
                 .email(request.getEmail())
                 .motDePasse(passwordEncoder.encode(request.getMotDePasse()))
                 .telephone(request.getTelephone())
+                .adresse(request.getAdresse())
                 .role(Role.ADOPTANT)
-                .statut(StatutCompte.EN_ATTENTE_VALIDATION)
+                .statut(StatutCompte.ACTIF)
                 .tokenVerificationEmail(UUID.randomUUID().toString())
-                .emailVerifie(false)
+                .emailVerifie(true)
                 .build();
 
-        return toResponse(utilisateurRepository.save(utilisateur));
+        if (utilisateur != null) {
+            return toResponse(utilisateurRepository.save(utilisateur));
+        }
+        throw new BusinessException("Erreur lors de la création du compte.");
     }
 
     // Connexion
@@ -107,7 +111,10 @@ public class CompteServiceImpl implements CompteService {
                 .emailVerifie(true)
                 .build();
 
-        return toResponse(utilisateurRepository.save(utilisateur));
+        if (utilisateur != null) {
+            return toResponse(utilisateurRepository.save(utilisateur));
+        }
+        throw new BusinessException("Erreur lors de la création du compte.");
     }
 
     // Modifier un compte
@@ -215,6 +222,7 @@ public class CompteServiceImpl implements CompteService {
                 .prenom(u.getPrenom())
                 .email(u.getEmail())
                 .telephone(u.getTelephone())
+                .adresse(u.getAdresse())
                 .role(u.getRole())
                 .statut(u.getStatut())
                 .emailVerifie(u.getEmailVerifie())
